@@ -1,11 +1,11 @@
 Summary:	Tree-sitter parser for Vim help files
 Name:		tree-sitter-vimdoc
-Version:	3.0.0
+Version:	3.0.1
 Release:	1
 License:	MIT
 Group:		Libraries
 Source0:	https://github.com/neovim/tree-sitter-vimdoc/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	93d5caeb022a63723d7e39d97c546af3
+# Source0-md5:	043ae1473a6790b92d6d7b56da0fa511
 URL:		https://github.com/neovim/tree-sitter-vimdoc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
