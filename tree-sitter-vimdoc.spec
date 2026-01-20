@@ -1,3 +1,7 @@
+#
+# Conditional build:
+%bcond_without	python3	# Python 3.x binding
+
 Summary:	Tree-sitter parser for Vim help files
 Summary(pl.UTF-8):	Analizator składniowy tree-parsera dla plików pomocy Vima
 Name:		tree-sitter-vimdoc
@@ -11,6 +15,11 @@ Source0:	https://github.com/neovim/tree-sitter-vimdoc/archive/v%{version}/%{name
 URL:		https://github.com/neovim/tree-sitter-vimdoc
 # c11
 BuildRequires:	gcc >= 6:4.7
+%if %{with python3}
+BuildRequires:	python3-devel >= 1:3.10
+BuildRequires:	python3-setuptools
+BuildRequires:	python3-wheel
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		soname_ver	4
@@ -57,6 +66,18 @@ Vim help files parser for Neovim.
 %description -n neovim-parser-vimdoc -l pl.UTF-8
 Analizator składni plików pomocy Vima dla Neovima.
 
+%package -n python3-tree-sitter-vimdoc
+Summary:	Vim help files parser for Python
+Summary(pl.UTF-8):	Analizator składni plików pomocy Vima dla Pythona
+Group:		Libraries/Python
+Requires:	python3-tree-sitter >= 0.24
+
+%description -n python3-tree-sitter-vimdoc
+Vim help files parser for Python.
+
+%description -n python3-tree-sitter-vimdoc -l pl.UTF-8
+Analizator składni plików pomocy Vima dla Pythona.
+
 %prep
 %setup -q
 
@@ -70,6 +91,10 @@ Analizator składni plików pomocy Vima dla Neovima.
 	CFLAGS="%{rpmcppflags} %{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
 
+%if %{with python3}
+%py3_build
+%endif
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_libdir}/nvim/parser
@@ -82,6 +107,12 @@ install -d $RPM_BUILD_ROOT%{_libdir}/nvim/parser
 	PCLIBDIR="%{_pkgconfigdir}"
 
 %{__ln_s} ../../libtree-sitter-vimdoc.so.%{soname_ver} $RPM_BUILD_ROOT%{_libdir}/nvim/parser/vimdoc.so
+
+%if %{with python3}
+%py3_install
+
+%{__rm} $RPM_BUILD_ROOT%{py3_sitedir}/tree_sitter_vimdoc/*.c
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -108,3 +139,16 @@ rm -rf $RPM_BUILD_ROOT
 %files -n neovim-parser-vimdoc
 %defattr(644,root,root,755)
 %{_libdir}/nvim/parser/vimdoc.so
+
+%if %{with python3}
+%files -n python3-tree-sitter-vimdoc
+%defattr(644,root,root,755)
+%dir %{py3_sitedir}/tree_sitter_vimdoc
+%{py3_sitedir}/tree_sitter_vimdoc/_binding.abi3.so
+%{py3_sitedir}/tree_sitter_vimdoc/__init__.py
+%{py3_sitedir}/tree_sitter_vimdoc/__init__.pyi
+%{py3_sitedir}/tree_sitter_vimdoc/py.typed
+%{py3_sitedir}/tree_sitter_vimdoc/__pycache__
+%{py3_sitedir}/tree_sitter_vimdoc/queries
+%{py3_sitedir}/tree_sitter_vimdoc-%{version}-py*.egg-info
+%endif
