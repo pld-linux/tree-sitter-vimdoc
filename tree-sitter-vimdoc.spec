@@ -2,6 +2,8 @@
 # Conditional build:
 %bcond_without	python3	# Python 3.x binding
 
+%define		api_ver		15
+
 Summary:	Tree-sitter parser for Vim help files
 Summary(pl.UTF-8):	Analizator składniowy tree-parsera dla plików pomocy Vima
 Name:		tree-sitter-vimdoc
@@ -61,6 +63,7 @@ Summary:	Vim help files parser for Neovim
 Summary(pl.UTF-8):	Analizator składni plików pomocy Vima dla Neovima
 Group:		Applications/Editors
 Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	c-tree-sitter(abi)%{?_isa} = %{api_ver}
 
 %description -n neovim-parser-vimdoc
 Vim help files parser for Neovim.
@@ -107,6 +110,9 @@ install -d $RPM_BUILD_ROOT%{_libdir}/nvim/parser
 	INCLUDEDIR="%{_includedir}" \
 	LIBDIR="%{_libdir}" \
 	PCLIBDIR="%{_pkgconfigdir}"
+
+# validate after all make invocations as make rule might have regenerated parser
+grep -q 'LANGUAGE_VERSION[[:space:]]*%{api_ver}$' src/parser.c
 
 %{__ln_s} ../../libtree-sitter-vimdoc.so.%{soname_ver} $RPM_BUILD_ROOT%{_libdir}/nvim/parser/vimdoc.so
 
